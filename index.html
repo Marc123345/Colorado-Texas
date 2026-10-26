@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colorado, Texas &amp; Southern Oklahoma Commercial Coating Territory Map | RoofCoat Leads</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'"/>
+<style>
+  :root{
+    --bg:#0f1722; --panel:#16212f; --panel2:#1c2a3b; --line:#2a3b52;
+    --text:#e8eef6; --muted:#93a4ba; --accent:#f5a623;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+
+  header{
+    display:flex;align-items:center;gap:14px;padding:12px 20px;
+    background:linear-gradient(90deg,#101b29,#152438);border-bottom:1px solid var(--line);z-index:1200;flex-wrap:wrap;
+  }
+  .logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#e8842c);display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
+  header h1{font-size:17px;font-weight:700;letter-spacing:.2px}
+  header .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .hdr-stats{margin-left:auto;display:flex;gap:18px}
+  .stat{text-align:right}
+  .stat b{display:block;font-size:17px;color:var(--accent)}
+  .stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+
+  /* region switch — Colorado and Texas are two separate territories, so only
+     one is on the map at a time */
+  .tabs{display:flex;gap:4px;background:#0f1a28;border:1px solid var(--line);border-radius:10px;padding:3px}
+  .tab{
+    font:600 12.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    border:0;background:transparent;color:var(--muted);border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;
+  }
+  .tab:hover{color:var(--text)}
+  .tab.on{background:var(--accent);color:#0d1420}
+
+  .wrap{flex:1;display:flex;min-height:0;position:relative}
+  #map{flex:1;background:#0b1320}
+
+  aside{
+    width:318px;flex:0 0 318px;background:var(--panel);border-right:1px solid var(--line);
+    overflow-y:auto;padding:14px;z-index:1100;
+  }
+  aside::-webkit-scrollbar{width:8px}
+  aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+  .side-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:14px 4px 8px}
+  .side-title:first-child{margin-top:2px}
+
+  .zone-card{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s, transform .1s;
+  }
+  .zone-card:hover{border-color:#3d557a}
+  .zone-card.off{opacity:.45}
+  .zone-head{display:flex;align-items:center;gap:9px}
+  .dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.06)}
+  .zone-head b{font-size:13.5px;flex:1}
+  .zone-head .cnt{font-size:11px;color:var(--muted);background:#22334a;border-radius:20px;padding:2px 8px}
+  .zone-card p{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+  .zone-actions{display:flex;gap:6px;margin-top:8px}
+  .zbtn{
+    font-size:11px;border:1px solid var(--line);background:transparent;color:var(--text);
+    border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s;
+  }
+  .zbtn:hover{background:#25384f}
+
+  .note{
+    background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.35);
+    border-radius:10px;padding:10px 12px;font-size:11.5px;color:#f0d9ad;line-height:1.5;margin-top:14px;
+  }
+  .note + .note{margin-top:8px}
+  .foot{margin-top:14px;font-size:10.5px;color:#5f7291;line-height:1.5}
+  .foot a{color:var(--accent);text-decoration:none}
+
+  /* Leaflet popup theming */
+  .leaflet-popup-content-wrapper{background:var(--panel2);color:var(--text);border-radius:10px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .leaflet-popup-tip{background:var(--panel2)}
+  .leaflet-popup-content{margin:12px 14px;font:12.5px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .pp h3{font-size:14px;margin-bottom:2px}
+  .pp .tag{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;border-radius:20px;padding:2px 8px;margin-bottom:7px;color:#0d1420;font-weight:700}
+  .pp .ads{background:#e8eef6;margin-left:4px}
+  .pp p{color:#c3d0e0}
+  .pp .dist{margin-top:6px;font-size:11px;color:var(--muted)}
+  .leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+
+  .leaflet-control-attribution{background:rgba(15,23,34,.8)!important;color:#5f7291!important}
+  .leaflet-control-attribution a{color:#7d94b5!important}
+  .leaflet-bar a{background:var(--panel2);color:var(--text);border-bottom:1px solid var(--line)}
+  .leaflet-bar a:hover{background:#25384f}
+
+  .city-label{
+    background:transparent;border:none;box-shadow:none;
+    color:#dbe6f3;font-size:10.5px;font-weight:600;text-shadow:0 1px 3px #000,0 0 6px #000;white-space:nowrap;
+  }
+
+  .mob-toggle{display:none}
+  @media (max-width:820px){
+    header{padding:10px 14px}
+    .tabs{width:100%}
+    .tab{flex:1}
+    aside{position:absolute;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .2s ease;box-shadow:8px 0 30px rgba(0,0,0,.5)}
+    aside.open{transform:translateX(0)}
+    .mob-toggle{
+      display:block;position:absolute;left:12px;top:12px;z-index:1150;
+      background:var(--panel2);border:1px solid var(--line);color:var(--text);
+      border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;
+    }
+    .hdr-stats{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🛡️</div>
+  <div>
+    <h1 id="hdrTitle">Commercial Coating — Territory Map</h1>
+    <div class="sub" id="hdrSub"></div>
+  </div>
+  <div class="hdr-stats">
+    <div class="stat"><b id="stMarkets">0</b><span>Markets</span></div>
+    <div class="stat"><b id="stZones">0</b><span>Zones</span></div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-region="co">Colorado</button>
+    <button class="tab" role="tab" data-region="tx">Texas &amp; Oklahoma</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <button class="mob-toggle" id="mobToggle">☰ Zones</button>
+  <aside id="sidebar">
+    <div class="side-title">Territory zones — click card to zoom, buttons to toggle</div>
+    <div id="zoneCards"></div>
+    <div id="regionNotes"></div>
+    <div class="foot">
+      Prepared by <a href="https://roofcoatleads.com" target="_blank" rel="noopener">RoofCoat Leads</a> · radii are indicative and adjustable once live lead data shows where the best jobs come from.
+    </div>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>if(!window.L){document.write('<script src="https:\/\/unpkg.com\/leaflet@1.9.4\/dist\/leaflet.js"><\/script>')}</script>
+<script>
+/* ---------------------------------- data ---------------------------------- */
+/* Two territories that never touch, so each is its own view. Colorado comes
+   first because it is the new one; the Texas side is the original map with the
+   drive times re-measured from his front door. */
+const REGIONS = {
+  co: {
+    title:"Colorado Commercial Coating — Territory Map",
+    labelZoom:7,
+    sub:"Front Range I-25 corridor · northern ag & energy tier · Western Slope · southern reaches",
+    notes:[
+      `<b>Where the ads run:</b> Denver metro, Colorado Springs, Fort Collins, Greeley and Pueblo only — the pins marked “Ads live”. That is one tight 2-hour corridor holding nearly all the roofs, and the hail story writes the ad copy. Grand Junction gets added later as its own small spend if he wants the Slope. Everything else is wasted budget.`,
+      `<b>Left off on purpose:</b> the mountain resorts — Vail, Aspen, Summit County, Steamboat. The commercial stock is steep metal in snow country, not flat-roof coating work, and the towns make contractors jump through permitting hoops.`,
+      `<b>Ask Paul:</b> where does the Colorado crew sit? Based in Denver, the corridor splits cleanly into north days and south days. Based somewhere like the Springs, the weighting shifts south.`
+    ]
+  },
+  tx: {
+    title:"Texas &amp; Southern Oklahoma Commercial Coating — Territory Map",
+    /* the corridor towns sit too close together to label at the whole-region view */
+    labelZoom:8,
+    sub:"US-75 corridor · North &amp; East Texas pockets · West Texas expansion · southern Oklahoma over the Red River · drive times from his front door",
+    notes:[
+      `<b>He lives on the western edge of the corridor</b>, inside the West Wing — Whitesboro is 5 minutes away. Every drive time on this side of the map is measured from his front door, not from Sherman.`,
+      `<b>Southern Oklahoma only — and that is the point.</b> His shop is 25 minutes off the Red River, which is a state line, not a market boundary: Ardmore is 55 minutes away, closer than Bonham. What is deliberately NOT here is the rest of the state. Oklahoma City and Tulsa are real markets, but a day each way against local contractors, which is a different business from the thin-competition work this territory is built on.`
+    ]
+  }
+};
+
+const ZONES = {
+  /* --- colorado --- */
+  front: {
+    region:"co", name:"Front Range Core — I-25", color:"#2f80ed",
+    desc:"About 85% of the state’s commercial roof stock. Denver has the biggest flat-roof inventory between Chicago and Phoenix and is the most hail-hammered metro in the country, so there is insurance-driven recoat work on top of normal maintenance."
+  },
+  north: {
+    region:"co", name:"Northern Tier — Ag & Energy", color:"#27ae60",
+    desc:"Meatpacking, brewing, sugar and grain processing — big flat and metal roofs. Sterling has almost no ad competition."
+  },
+  slope: {
+    region:"co", name:"Western Slope", color:"#e67e22",
+    desc:"A separate world, four hours over the mountains. Grand Junction is the only real commercial base out west — a later, separate spend if he wants it."
+  },
+  south: {
+    region:"co", name:"Southern Reaches", color:"#9b59b6",
+    desc:"Thin. Only worth working if the leads come in free — no ad spend here."
+  },
+
+  /* --- texas & oklahoma --- */
+  core: {
+    region:"tx", name:"US-75 Corridor Core", color:"#2f80ed",
+    desc:"Sherman/Denison center line — he lives on its western edge. Semiconductor build-out (TI + GlobiTech multi-billion-dollar plants) is driving new commercial construction north along US-75."
+  },
+  west: {
+    region:"tx", name:"West Wing", color:"#e67e22",
+    desc:"His home patch. Gainesville is the anchor — I-35 warehouse and manufacturing stock — running out toward Bowie."
+  },
+  east: {
+    region:"tx", name:"East Wing", color:"#27ae60",
+    desc:"Small-town commercial, ag buildings and light industrial from Whitewright out to Paris."
+  },
+  pocket: {
+    region:"tx", name:"East Texas Pockets", color:"#9b59b6",
+    desc:"Poultry plants, dairy operations and food processing with large flat & metal roofs. Very little ad competition. Greenville links the pocket to the corridor along I-30."
+  },
+  wtx: {
+    region:"tx", name:"West Texas Expansion", color:"#e74c3c",
+    desc:"Hail belt + brutal UV = constant coating demand. Ag processing, oilfield services, warehouse stock and two air force bases, running out along I-20 to the Permian Basin. Wichita Falls is the natural bridge from his current territory."
+  },
+  ok: {
+    region:"tx", name:"Southern Oklahoma", color:"#f5a623",
+    desc:"His shop is 25 minutes off the river. Ardmore is the prize — Michelin tyre plant, a Valero refinery and I-35 distribution. Durant is the second anchor: Choctaw Nation HQ, casino resort and manufacturing."
+  }
+};
+
+/* d = distance and drive time. Texas & Oklahoma: from his front door.
+   Colorado: as given in the brief, from Denver unless it says otherwise.
+   ads = inside the Colorado ad footprint. */
+const CITIES = [
+  /* ===================== COLORADO ===================== */
+  /* --- front range core --- */
+  {n:"Denver", z:"front", ll:[39.7392,-104.9903], star:true, ads:true, b:"The anchor. Biggest flat-roof inventory between Chicago and Phoenix, and the most hail-hammered metro in the country — insurance-driven recoat work on top of normal maintenance."},
+  {n:"Commerce City", z:"front", ll:[39.8083,-104.9339], ads:true, b:"Refineries and rail industrial."},
+  {n:"Aurora", z:"front", ll:[39.7294,-104.8319], ads:true, b:"Warehouse and distribution."},
+  {n:"Westminster / Thornton", z:"front", ll:[39.8520,-105.0050], ads:true, b:"Metro commercial."},
+  {n:"Broomfield", z:"front", ll:[39.9205,-105.0867], ads:true, d:"30 min from Denver", b:"Metro commercial."},
+  {n:"Boulder", z:"front", ll:[40.0150,-105.2705], ads:true, d:"40 min from Denver", b:"Tech and flex space."},
+  {n:"Longmont", z:"front", ll:[40.1672,-105.1019], ads:true, d:"45 min from Denver", b:"Manufacturing."},
+  {n:"Castle Rock", z:"front", ll:[39.3722,-104.8561], ads:true, d:"35 min from Denver", b:"Metro commercial on I-25 between Denver and the Springs."},
+  {n:"Colorado Springs", z:"front", ll:[38.8339,-104.8214], star:true, ads:true, d:"1 hr 10 from Denver", b:"Five military installations, a warehouse belt and the same hail exposure as Denver."},
+  {n:"Pueblo", z:"front", ll:[38.2544,-104.6091], ads:true, d:"1 hr 45 from Denver", b:"EVRAZ steel mill — the industrial south anchor."},
+
+  /* --- northern tier --- */
+  {n:"Fort Collins", z:"north", ll:[40.5853,-105.0844], star:true, ads:true, d:"1 hr from Denver", b:"North anchor — brewing and manufacturing."},
+  {n:"Loveland", z:"north", ll:[40.3978,-105.0750], d:"55 min from Denver", b:"Light industrial between Fort Collins and Longmont."},
+  {n:"Greeley", z:"north", ll:[40.4233,-104.7091], ads:true, d:"1 hr from Denver", b:"JBS meatpacking and ag processing — big flat and metal roofs."},
+  {n:"Fort Morgan", z:"north", ll:[40.2503,-103.7999], d:"1 hr 15 from Denver", b:"Cargill plant."},
+  {n:"Sterling", z:"north", ll:[40.6255,-103.2077], d:"2 hr from Denver", b:"Ag and rail, almost no ad competition."},
+
+  /* --- western slope --- */
+  {n:"Grand Junction", z:"slope", ll:[39.0639,-108.5506], star:true, d:"~4 hr from Denver", b:"Ag and energy services — the only real commercial base out west."},
+  {n:"Montrose", z:"slope", ll:[38.4783,-107.8762], d:"1 hr from Grand Junction", b:"Ag and light commercial."},
+  {n:"Rifle", z:"slope", ll:[39.5347,-107.7831], b:"Oil and gas services."},
+  {n:"Glenwood Springs", z:"slope", ll:[39.5505,-107.3248], b:"Oil and gas services."},
+
+  /* --- southern reaches --- */
+  {n:"Alamosa", z:"south", ll:[37.4695,-105.8700], b:"San Luis Valley ag."},
+  {n:"Durango", z:"south", ll:[37.2753,-107.8801], b:"South-west corner, isolated."},
+  {n:"La Junta", z:"south", ll:[37.9850,-103.5438], b:"Arkansas Valley ag."},
+  {n:"Lamar", z:"south", ll:[38.0872,-102.6208], b:"Arkansas Valley ag."},
+
+  /* ================ TEXAS & SOUTHERN OKLAHOMA ================ */
+  /* --- corridor core --- */
+  {n:"Sherman", z:"core", ll:[33.635,-96.609], d:"20 mi · 25 min", b:"Territory center line. Home of the new TI semiconductor fabs — one of the largest industrial investments in Texas history.", star:true},
+  {n:"Denison", z:"core", ll:[33.755,-96.537], d:"22 mi · 28 min", b:"Corridor co-anchor on US-75, just south of the Red River."},
+  {n:"Van Alstyne", z:"core", ll:[33.421,-96.577], d:"30 mi · 35 min", b:"Fast-growing US-75 town on the corridor's southern half."},
+  {n:"Anna", z:"core", ll:[33.349,-96.548], d:"40 mi · 45 min", b:"Northern edge of DFW Metroplex growth pushing up US-75."},
+  {n:"Melissa", z:"core", ll:[33.286,-96.573], d:"45 mi · 48 min", b:"Southern tip of the corridor — Metroplex growth frontier."},
+
+  /* --- west wing --- */
+  {n:"Whitesboro", z:"west", ll:[33.656,-96.907], d:"3 mi · 5 min", b:"His doorstep. US-82 commercial between Sherman and Gainesville."},
+  {n:"Collinsville", z:"west", ll:[33.561,-96.911], d:"10 mi · 15 min", b:"Small commercial/ag."},
+  {n:"Gainesville", z:"west", ll:[33.626,-97.133], d:"22 mi · 25 min", b:"Western commercial anchor on I-35 — strong warehouse and manufacturing stock.", star:true},
+  {n:"Valley View", z:"west", ll:[33.489,-97.163], d:"30 mi · 35 min", b:"I-35 corridor south of Gainesville."},
+  {n:"Pilot Point", z:"west", ll:[33.396,-96.960], d:"30 mi · 35 min", b:"Horse-country ag buildings, north Denton County growth."},
+  {n:"Muenster", z:"west", ll:[33.652,-97.376], d:"38 mi · 45 min", b:"Dairy and ag processing."},
+  {n:"Nocona", z:"west", ll:[33.787,-97.726], d:"50 mi · 55 min", b:"Boot/leather manufacturing heritage, light industrial."},
+  {n:"Bowie", z:"west", ll:[33.559,-97.849], d:"65 mi · 1 hr 10", b:"Western edge of the wing, US-287 junction."},
+
+  /* --- east wing --- */
+  {n:"Whitewright", z:"east", ll:[33.512,-96.393], d:"35 mi · 40 min", b:"Corridor-adjacent small commercial."},
+  {n:"Bonham", z:"east", ll:[33.577,-96.178], d:"50 mi · 1 hr", b:"Hub for small-town commercial, ag buildings and light industrial."},
+  {n:"Leonard", z:"east", ll:[33.379,-96.247], d:"50 mi · 1 hr", b:"Ag and light commercial."},
+  {n:"Wolfe City", z:"east", ll:[33.370,-96.070], d:"60 mi · 1 hr 10", b:"Small-town commercial."},
+  {n:"Honey Grove", z:"east", ll:[33.583,-95.910], d:"65 mi · 1 hr 10", b:"Ag buildings along the TX-56/US-82 line."},
+  {n:"Commerce", z:"east", ll:[33.247,-95.900], d:"70 mi · 1 hr 15", b:"University town (Texas A&M–Commerce) with steady commercial base."},
+  {n:"Paris", z:"east", ll:[33.661,-95.556], d:"100 mi · 1 hr 45", b:"Eastern anchor — largest market on the east wing (~25k city, regional draw)."},
+
+  /* --- east texas pockets --- */
+  {n:"Greenville", z:"pocket", ll:[33.138,-96.111], d:"75 mi · 1 hr 20", b:"I-30 connector between the corridor and the East Texas pocket. L3Harris and a real industrial base.", star:true},
+  {n:"Sulphur Springs", z:"pocket", ll:[33.138,-95.601], d:"105 mi · 1 hr 50", b:"Dairy capital of Texas — milk processing and food plants with big flat roofs."},
+  {n:"Mount Vernon", z:"pocket", ll:[33.189,-95.221], d:"125 mi · 2 hr", b:"I-30 ag and light commercial."},
+  {n:"Winnsboro", z:"pocket", ll:[32.958,-95.290], d:"125 mi · 2 hr", b:"Poultry and dairy operations."},
+  {n:"Mount Pleasant", z:"pocket", ll:[33.157,-94.968], d:"140 mi · 2 hr 15", b:"Poultry processing hub (Pilgrim's Pride) — large industrial roof stock."},
+  {n:"Pittsburg", z:"pocket", ll:[32.995,-94.966], d:"140 mi · 2 hr 15", b:"Poultry processing and feed mills."},
+
+  /* --- west texas expansion --- */
+  {n:"Wichita Falls", z:"wtx", ll:[33.914,-98.493], d:"95 mi · 1 hr 40", b:"The natural first extension west along US-82. Manufacturing base + Sheppard AFB.", star:true},
+  {n:"Abilene", z:"wtx", ll:[32.449,-99.733], d:"220 mi · 3 hr 20", b:"I-20 regional hub — warehouses, ag processing, Dyess AFB."},
+  {n:"San Angelo", z:"wtx", ll:[31.464,-100.437], d:"290 mi · 4 hr 30", b:"Regional ag/industrial hub — wool, ag processing, oilfield services."},
+  {n:"Big Spring", z:"wtx", ll:[32.2504,-101.4787], d:"360 mi · 5 hr 30", b:"I-20 refinery town on the eastern edge of the Permian Basin."},
+  {n:"Midland", z:"wtx", ll:[31.9973,-102.0779], d:"400 mi · 6 hr", b:"Permian Basin oilfield headquarters — offices, yards and service shops."},
+  {n:"Odessa", z:"wtx", ll:[31.8457,-102.3676], d:"420 mi · 6 hr 15", b:"Permian Basin oilfield services and industrial yards."},
+  {n:"Andrews", z:"wtx", ll:[32.3187,-102.5457], d:"430 mi · 6 hr 30", b:"Oilfield services at the far west edge of the territory."},
+
+  /* --- southern oklahoma --- */
+  {n:"Colbert, OK", z:"ok", ll:[33.8573,-96.5053], d:"30 mi · 35 min", b:"First town over the Red River. Small commercial and truck stop stock on US-69/75."},
+  {n:"Madill, OK", z:"ok", ll:[34.0926,-96.7714], d:"35 mi · 45 min", b:"Ag and light commercial between Durant and Ardmore."},
+  {n:"Durant, OK", z:"ok", ll:[33.9943,-96.3711], d:"45 mi · 50 min", b:"Choctaw Nation headquarters, casino resort and manufacturing, straight up US-75.", star:true},
+  {n:"Ardmore, OK", z:"ok", ll:[34.1743,-97.1436], d:"50 mi · 55 min", b:"The best industrial market in reach north of the river: Michelin tyre plant, Valero refinery and I-35 distribution. Closer than Bonham.", star:true},
+  {n:"Tishomingo, OK", z:"ok", ll:[34.2359,-96.6786], d:"50 mi · 1 hr", b:"Small-town commercial and county seat stock."},
+  {n:"Atoka, OK", z:"ok", ll:[34.3859,-96.1281], d:"80 mi · 1 hr 30", b:"US-69 light industrial and trucking on the McAlester run."},
+  {n:"Hugo, OK", z:"ok", ll:[34.0109,-95.5111], d:"105 mi · 2 hr", b:"Ag and rail stock east along US-70."},
+  {n:"McAlester, OK", z:"ok", ll:[34.9334,-95.7697], d:"140 mi · 2 hr 20", b:"Army Ammunition Plant plus a real manufacturing base — the furthest north worth a routed day.", star:true},
+  {n:"Idabel, OK", z:"ok", ll:[33.8951,-94.8261], d:"165 mi · 2 hr 45", b:"Timber and ag in the south-east corner — pairs with the Paris end of the east wing."}
+];
+
+/* semiconductor plants — special markers in the Texas core */
+const PLANTS = [
+  {n:"Texas Instruments — Sherman fabs", ll:[33.687,-96.577], d:"20 mi · 25 min", b:"Multi-fab semiconductor campus under construction — up to $30B+ build-out. Every supplier and contractor building around it needs roofs coated."},
+  {n:"GlobiTech / GlobalWafers", ll:[33.663,-96.643], d:"20 mi · 25 min", b:"Silicon wafer plant — $5B investment anchoring Sherman's industrial growth."}
+];
+
+/* ------------------------------- map setup -------------------------------- */
+const map = L.map('map',{zoomControl:true, attributionControl:true}).setView([36,-100], 5);
+/* Esri dark tiles, not CARTO — CARTO's keyless dark tiles now come back
+   stamped "API KEY REQUIRED". OSM swaps in if Esri ever errors the same way. */
+const base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
+  maxZoom:16
+}).addTo(map);
+
+let swapped = false;
+base.on('tileerror', () => {
+  if(swapped) return;
+  swapped = true;
+  map.removeLayer(base);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom:19
+  }).addTo(map);
+});
+
+/* Groups are built once and added/removed when the region changes. */
+const groups = {};
+Object.keys(ZONES).forEach(k => groups[k] = L.layerGroup());
+
+function popupHTML(c){
+  const z = ZONES[c.z];
+  return `<div class="pp">
+    <h3>${c.star ? "⭐ " : ""}${c.n}</h3>
+    <span class="tag" style="background:${z.color}">${z.name}</span>${c.ads ? '<span class="tag ads">Ads live</span>' : ''}
+    <p>${c.b}</p>
+    ${c.d ? `<div class="dist">🚗 ${c.d}</div>` : ''}
+  </div>`;
+}
+
+function addCity(c){
+  const z = ZONES[c.z];
+  const r = c.star ? 9 : 6;
+  const m = L.circleMarker(c.ll,{
+    radius:r, color:"#0d1420", weight:1.5, fillColor:z.color, fillOpacity:.95
+  }).bindPopup(popupHTML(c));
+  m.bindTooltip(c.n,{permanent:true,direction:'right',offset:[8,0],className:'city-label'});
+  m.addTo(groups[c.z]);
+}
+CITIES.forEach(addCity);
+
+/* semiconductor plant markers */
+PLANTS.forEach(p=>{
+  const m = L.marker(p.ll,{
+    icon: L.divIcon({className:'', html:'<div style="font-size:20px;filter:drop-shadow(0 1px 3px #000)">🏭</div>', iconSize:[22,22], iconAnchor:[11,11]})
+  }).bindPopup(`<div class="pp"><h3>🏭 ${p.n}</h3><span class="tag" style="background:${ZONES.core.color}">Semiconductor build-out</span><p>${p.b}</p><div class="dist">🚗 ${p.d}</div></div>`);
+  m.addTo(groups.core);
+});
+
+function zoneCircle(ll, radius, zoneKey, title, body){
+  const z = ZONES[zoneKey];
+  L.circle(ll,{radius, color:z.color, weight:1.5, dashArray:"4 6", fillColor:z.color, fillOpacity:.06})
+   .bindPopup(`<div class="pp"><h3>${title}</h3><span class="tag" style="background:${z.color}">${z.name}</span><p>${body}</p></div>`)
+   .addTo(groups[zoneKey]);
+}
+
+/* -------- colorado shapes -------- */
+
+/* The ad footprint: Fort Collins/Greeley down I-25 to Pueblo. */
+L.polyline([[40.5853,-105.0844],[40.3978,-105.0750],[40.1672,-105.1019],[39.9205,-105.0867],[39.7392,-104.9903],[39.3722,-104.8561],[38.8339,-104.8214],[38.2544,-104.6091]],
+  {color:"#2f80ed",weight:3,opacity:.55,dashArray:"10 8"})
+ .bindPopup(`<div class="pp"><h3>I-25 Front Range corridor</h3><span class="tag" style="background:#2f80ed">Ad footprint</span><p>Fort Collins to Pueblo — one tight 2-hour corridor holding nearly all of Colorado’s commercial roofs. Ads run on Denver metro, the Springs, Fort Collins, Greeley and Pueblo only.</p></div>`)
+ .addTo(groups.front);
+
+zoneCircle([39.7392,-104.9903], 40000, "front", "Denver metro", "25 mile working radius — Denver, Aurora, Commerce City, Westminster/Thornton, Broomfield and Boulder.");
+zoneCircle([38.8339,-104.8214], 30000, "front", "Colorado Springs", "Military installations, warehouse belt, same hail exposure as Denver.");
+zoneCircle([38.2544,-104.6091], 22000, "front", "Pueblo", "Industrial south anchor.");
+zoneCircle([40.5000,-104.9000], 30000, "north", "Fort Collins / Greeley", "North anchor pair inside the ad footprint.");
+zoneCircle([39.0639,-108.5506], 35000, "slope", "Grand Junction", "Its own small spend later, only if he wants the Slope.");
+
+/* -------- texas shapes -------- */
+
+/* main corridor band: 50 mi east & west of US-75, Sherman/Denison center line */
+L.polygon([
+  [33.92,-97.90],[33.92,-95.50],[33.20,-95.50],[33.20,-97.90]
+],{
+  color:"#2f80ed", weight:2, dashArray:"6 6", fillColor:"#2f80ed", fillOpacity:.06
+}).bindPopup(`<div class="pp"><h3>Primary Territory Band</h3><span class="tag" style="background:#2f80ed">≈100 mi wide</span><p>US-75 corridor with Sherman/Denison as the center line, extending east to Paris and west to Bowie. He lives on its western edge. Radius adjustable once live lead data shows where the best jobs come from.</p></div>`)
+ .addTo(groups.core);
+
+/* east texas pocket circle */
+L.circle([33.08,-95.25],{radius:60000, color:"#9b59b6", weight:2, dashArray:"6 6", fillColor:"#9b59b6", fillOpacity:.07})
+ .bindPopup(`<div class="pp"><h3>East Texas Pocket</h3><span class="tag" style="background:#9b59b6">Add-on zone</span><p>Poultry, dairy and food-processing belt — big flat & metal roofs, almost no ad competition targeting it.</p></div>`)
+ .addTo(groups.pocket);
+
+/* west texas metro circles; Midland/Odessa share one */
+[[33.914,-98.493,"Wichita Falls"],[32.449,-99.733,"Abilene"],[31.464,-100.437,"San Angelo"],[31.92,-102.22,"Midland / Odessa"]].forEach(([la,lo,nm])=>{
+  L.circle([la,lo],{radius:55000,color:"#e74c3c",weight:1.5,dashArray:"4 6",fillColor:"#e74c3c",fillOpacity:.05})
+   .bindPopup(`<div class="pp"><h3>${nm}</h3><span class="tag" style="background:#e74c3c">Expansion market</span><p>Hail belt + high UV — steady commercial coating demand.</p></div>`)
+   .addTo(groups.wtx);
+});
+
+/* Oklahoma is drawn as routes and radii, not a band: the southern edge is the
+   Red River, which wanders, and a straight-line band would put half of
+   Grayson County, TX inside an Oklahoma zone. */
+
+/* US-75/69 north: Denison -> Colbert -> Durant -> Atoka -> McAlester */
+L.polyline([[33.755,-96.537],[33.857,-96.505],[33.994,-96.371],[34.386,-96.128],[34.933,-95.770]],
+  {color:"#f5a623",weight:3,opacity:.55,dashArray:"10 8"})
+ .bindPopup(`<div class="pp"><h3>US-75 / US-69 north</h3><span class="tag" style="background:#f5a623">Oklahoma run</span><p>Straight up the road the corridor already sits on: Durant is 50 minutes from his door, Atoka 1 hr 30, McAlester 2 hr 20 — a routed day, not an expedition.</p></div>`)
+ .addTo(groups.ok);
+
+/* US-70 / I-35 west: Durant -> Madill -> Ardmore */
+L.polyline([[33.994,-96.371],[34.093,-96.771],[34.174,-97.144]],
+  {color:"#f5a623",weight:3,opacity:.55,dashArray:"10 8"})
+ .bindPopup(`<div class="pp"><h3>US-70 west to I-35</h3><span class="tag" style="background:#f5a623">Oklahoma run</span><p>Durant across to Ardmore via Madill, joining I-35. Ardmore is 55 minutes from his door — closer than Bonham, and a bigger industrial market.</p></div>`)
+ .addTo(groups.ok);
+
+/* Working radii on the anchors only — the smaller towns are pins on a route. */
+zoneCircle([34.1743,-97.1436], 40000, "ok", "Ardmore", "25 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
+zoneCircle([33.9943,-96.3711], 32000, "ok", "Durant", "20 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
+zoneCircle([34.9334,-95.7697], 32000, "ok", "McAlester", "20 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
+
+/* -------------------------------- sidebar --------------------------------- */
+const counts = {};
+CITIES.forEach(c => counts[c.z]=(counts[c.z]||0)+1);
+counts.core += PLANTS.length;
+
+/* Zoom frames whatever a zone actually contains, so adding or moving a pin can
+   never leave its card zooming to a stale centre. */
+function boundsOf(keys){
+  const b = L.latLngBounds([]);
+  keys.forEach(k => groups[k].eachLayer(l => {
+    if (l.getBounds) b.extend(l.getBounds());
+    else if (l.getLatLng) b.extend(l.getLatLng());
+  }));
+  return b;
+}
+function flyToZone(key){
+  const b = boundsOf([key]);
+  if (b.isValid()) map.flyToBounds(b, {padding:[40,40], duration:.9, maxZoom:10});
+}
+
+let region = null;
+function showRegion(key){
+  if (!REGIONS[key]) key = "co";
+  region = key;
+  const r = REGIONS[key];
+  const keys = Object.keys(ZONES).filter(k => ZONES[k].region === key);
+
+  Object.keys(groups).forEach(k => {
+    if (keys.includes(k)) groups[k].addTo(map);
+    else map.removeLayer(groups[k]);
+  });
+
+  document.getElementById('hdrTitle').innerHTML = r.title;
+  document.getElementById('hdrSub').innerHTML = r.sub;
+  document.getElementById('stZones').textContent = keys.length;
+  document.getElementById('stMarkets').textContent = keys.reduce((s,k)=>s+(counts[k]||0),0);
+  document.querySelectorAll('.tab').forEach(t => {
+    const on = t.dataset.region === key;
+    t.classList.toggle('on', on);
+    t.setAttribute('aria-selected', on);
+  });
+
+  const cardsEl = document.getElementById('zoneCards');
+  cardsEl.innerHTML = '';
+  keys.forEach(k => {
+    const z = ZONES[k];
+    const card = document.createElement('div');
+    card.className='zone-card'; card.id='card-'+k;
+    card.innerHTML = `
+      <div class="zone-head">
+        <span class="dot" style="background:${z.color}"></span>
+        <b>${z.name}</b>
+        <span class="cnt">${counts[k]||0}</span>
+      </div>
+      <p>${z.desc}</p>
+      <div class="zone-actions">
+        <button class="zbtn" data-act="zoom">🔍 Zoom</button>
+        <button class="zbtn" data-act="toggle">👁 Show / hide</button>
+      </div>`;
+    card.addEventListener('click',e=>{
+      const btn = e.target.closest('.zbtn');
+      if(btn && btn.dataset.act==='toggle'){
+        e.stopPropagation();
+        if(map.hasLayer(groups[k])){ map.removeLayer(groups[k]); card.classList.add('off'); }
+        else { groups[k].addTo(map); card.classList.remove('off'); }
+        return;
+      }
+      if(!map.hasLayer(groups[k])){ groups[k].addTo(map); card.classList.remove('off'); }
+      flyToZone(k);
+      if(window.innerWidth<=820) document.getElementById('sidebar').classList.remove('open');
+    });
+    cardsEl.appendChild(card);
+  });
+
+  document.getElementById('regionNotes').innerHTML = r.notes.map(n => `<div class="note">${n}</div>`).join('');
+  document.getElementById('sidebar').scrollTop = 0;
+
+  const b = boundsOf(keys);
+  if (b.isValid()) map.fitBounds(b, {padding:[30,30]});
+  labelVisibility();
+  if (location.hash !== '#'+key) history.replaceState(null, '', '#'+key);
+}
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showRegion(t.dataset.region)));
+window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== region) showRegion(location.hash.slice(1)); });
+
+/* hide city labels when zoomed way out to reduce clutter */
+function labelVisibility(){
+  const show = map.getZoom() >= (REGIONS[region] ? REGIONS[region].labelZoom : 8);
+  document.querySelectorAll('.city-label').forEach(el=>{
+    el.style.display = show ? '' : 'none';
+  });
+}
+map.on('zoomend', labelVisibility);
+
+/* mobile sidebar */
+document.getElementById('mobToggle').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+showRegion(location.hash.slice(1) || "co");
+</script>
+</body>
+</html>
