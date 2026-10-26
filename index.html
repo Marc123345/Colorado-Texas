@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Colorado, Texas &amp; Southern Oklahoma Commercial Coating Territory Map | RoofCoat Leads</title>
+<title>Colorado &amp; Texas Commercial Coating Territory Map | RoofCoat Leads</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'"/>
 <style>
@@ -135,7 +135,7 @@
   </div>
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" data-region="co">Colorado</button>
-    <button class="tab" role="tab" data-region="tx">Texas &amp; Oklahoma</button>
+    <button class="tab" role="tab" data-region="tx">Texas</button>
   </div>
 </header>
 
@@ -171,13 +171,12 @@ const REGIONS = {
     ]
   },
   tx: {
-    title:"Texas &amp; Southern Oklahoma Commercial Coating — Territory Map",
+    title:"Texas Commercial Coating — Territory Map",
     /* the corridor towns sit too close together to label at the whole-region view */
     labelZoom:8,
-    sub:"US-75 corridor · North &amp; East Texas pockets · West Texas expansion · southern Oklahoma over the Red River · drive times from his front door",
+    sub:"US-75 corridor · North &amp; East Texas pockets · West Texas expansion · drive times from his front door",
     notes:[
-      `<b>He lives on the western edge of the corridor</b>, inside the West Wing — Whitesboro is 5 minutes away. Every drive time on this side of the map is measured from his front door, not from Sherman.`,
-      `<b>Southern Oklahoma only — and that is the point.</b> His shop is 25 minutes off the Red River, which is a state line, not a market boundary: Ardmore is 55 minutes away, closer than Bonham. What is deliberately NOT here is the rest of the state. Oklahoma City and Tulsa are real markets, but a day each way against local contractors, which is a different business from the thin-competition work this territory is built on.`
+      `<b>He lives on the western edge of the corridor</b>, inside the West Wing — Whitesboro is 5 minutes away. Every drive time on this side of the map is measured from his front door, not from Sherman.`
     ]
   }
 };
@@ -201,7 +200,7 @@ const ZONES = {
     desc:"Thin. Only worth working if the leads come in free — no ad spend here."
   },
 
-  /* --- texas & oklahoma --- */
+  /* --- texas --- */
   core: {
     region:"tx", name:"US-75 Corridor Core", color:"#2f80ed",
     desc:"Sherman/Denison center line — he lives on its western edge. Semiconductor build-out (TI + GlobiTech multi-billion-dollar plants) is driving new commercial construction north along US-75."
@@ -221,14 +220,10 @@ const ZONES = {
   wtx: {
     region:"tx", name:"West Texas Expansion", color:"#e74c3c",
     desc:"Hail belt + brutal UV = constant coating demand. Ag processing, oilfield services, warehouse stock and two air force bases, running out along I-20 to the Permian Basin. Wichita Falls is the natural bridge from his current territory."
-  },
-  ok: {
-    region:"tx", name:"Southern Oklahoma", color:"#f5a623",
-    desc:"His shop is 25 minutes off the river. Ardmore is the prize — Michelin tyre plant, a Valero refinery and I-35 distribution. Durant is the second anchor: Choctaw Nation HQ, casino resort and manufacturing."
   }
 };
 
-/* d = distance and drive time. Texas & Oklahoma: from his front door.
+/* d = distance and drive time. Texas: from his front door.
    Colorado: as given in the brief, from Denver unless it says otherwise.
    ads = inside the Colorado ad footprint. */
 const CITIES = [
@@ -264,7 +259,7 @@ const CITIES = [
   {n:"La Junta", z:"south", ll:[37.9850,-103.5438], b:"Arkansas Valley ag."},
   {n:"Lamar", z:"south", ll:[38.0872,-102.6208], b:"Arkansas Valley ag."},
 
-  /* ================ TEXAS & SOUTHERN OKLAHOMA ================ */
+  /* ======================= TEXAS ======================= */
   /* --- corridor core --- */
   {n:"Sherman", z:"core", ll:[33.635,-96.609], d:"20 mi · 25 min", b:"Territory center line. Home of the new TI semiconductor fabs — one of the largest industrial investments in Texas history.", star:true},
   {n:"Denison", z:"core", ll:[33.755,-96.537], d:"22 mi · 28 min", b:"Corridor co-anchor on US-75, just south of the Red River."},
@@ -306,18 +301,7 @@ const CITIES = [
   {n:"Big Spring", z:"wtx", ll:[32.2504,-101.4787], d:"360 mi · 5 hr 30", b:"I-20 refinery town on the eastern edge of the Permian Basin."},
   {n:"Midland", z:"wtx", ll:[31.9973,-102.0779], d:"400 mi · 6 hr", b:"Permian Basin oilfield headquarters — offices, yards and service shops."},
   {n:"Odessa", z:"wtx", ll:[31.8457,-102.3676], d:"420 mi · 6 hr 15", b:"Permian Basin oilfield services and industrial yards."},
-  {n:"Andrews", z:"wtx", ll:[32.3187,-102.5457], d:"430 mi · 6 hr 30", b:"Oilfield services at the far west edge of the territory."},
-
-  /* --- southern oklahoma --- */
-  {n:"Colbert, OK", z:"ok", ll:[33.8573,-96.5053], d:"30 mi · 35 min", b:"First town over the Red River. Small commercial and truck stop stock on US-69/75."},
-  {n:"Madill, OK", z:"ok", ll:[34.0926,-96.7714], d:"35 mi · 45 min", b:"Ag and light commercial between Durant and Ardmore."},
-  {n:"Durant, OK", z:"ok", ll:[33.9943,-96.3711], d:"45 mi · 50 min", b:"Choctaw Nation headquarters, casino resort and manufacturing, straight up US-75.", star:true},
-  {n:"Ardmore, OK", z:"ok", ll:[34.1743,-97.1436], d:"50 mi · 55 min", b:"The best industrial market in reach north of the river: Michelin tyre plant, Valero refinery and I-35 distribution. Closer than Bonham.", star:true},
-  {n:"Tishomingo, OK", z:"ok", ll:[34.2359,-96.6786], d:"50 mi · 1 hr", b:"Small-town commercial and county seat stock."},
-  {n:"Atoka, OK", z:"ok", ll:[34.3859,-96.1281], d:"80 mi · 1 hr 30", b:"US-69 light industrial and trucking on the McAlester run."},
-  {n:"Hugo, OK", z:"ok", ll:[34.0109,-95.5111], d:"105 mi · 2 hr", b:"Ag and rail stock east along US-70."},
-  {n:"McAlester, OK", z:"ok", ll:[34.9334,-95.7697], d:"140 mi · 2 hr 20", b:"Army Ammunition Plant plus a real manufacturing base — the furthest north worth a routed day.", star:true},
-  {n:"Idabel, OK", z:"ok", ll:[33.8951,-94.8261], d:"165 mi · 2 hr 45", b:"Timber and ag in the south-east corner — pairs with the Paris end of the east wing."}
+  {n:"Andrews", z:"wtx", ll:[32.3187,-102.5457], d:"430 mi · 6 hr 30", b:"Oilfield services at the far west edge of the territory."}
 ];
 
 /* semiconductor plants — special markers in the Texas core */
@@ -422,27 +406,6 @@ L.circle([33.08,-95.25],{radius:60000, color:"#9b59b6", weight:2, dashArray:"6 6
    .bindPopup(`<div class="pp"><h3>${nm}</h3><span class="tag" style="background:#e74c3c">Expansion market</span><p>Hail belt + high UV — steady commercial coating demand.</p></div>`)
    .addTo(groups.wtx);
 });
-
-/* Oklahoma is drawn as routes and radii, not a band: the southern edge is the
-   Red River, which wanders, and a straight-line band would put half of
-   Grayson County, TX inside an Oklahoma zone. */
-
-/* US-75/69 north: Denison -> Colbert -> Durant -> Atoka -> McAlester */
-L.polyline([[33.755,-96.537],[33.857,-96.505],[33.994,-96.371],[34.386,-96.128],[34.933,-95.770]],
-  {color:"#f5a623",weight:3,opacity:.55,dashArray:"10 8"})
- .bindPopup(`<div class="pp"><h3>US-75 / US-69 north</h3><span class="tag" style="background:#f5a623">Oklahoma run</span><p>Straight up the road the corridor already sits on: Durant is 50 minutes from his door, Atoka 1 hr 30, McAlester 2 hr 20 — a routed day, not an expedition.</p></div>`)
- .addTo(groups.ok);
-
-/* US-70 / I-35 west: Durant -> Madill -> Ardmore */
-L.polyline([[33.994,-96.371],[34.093,-96.771],[34.174,-97.144]],
-  {color:"#f5a623",weight:3,opacity:.55,dashArray:"10 8"})
- .bindPopup(`<div class="pp"><h3>US-70 west to I-35</h3><span class="tag" style="background:#f5a623">Oklahoma run</span><p>Durant across to Ardmore via Madill, joining I-35. Ardmore is 55 minutes from his door — closer than Bonham, and a bigger industrial market.</p></div>`)
- .addTo(groups.ok);
-
-/* Working radii on the anchors only — the smaller towns are pins on a route. */
-zoneCircle([34.1743,-97.1436], 40000, "ok", "Ardmore", "25 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
-zoneCircle([33.9943,-96.3711], 32000, "ok", "Durant", "20 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
-zoneCircle([34.9334,-95.7697], 32000, "ok", "McAlester", "20 mile working radius — indicative, and adjustable once live lead data shows where the jobs actually come from.");
 
 /* -------------------------------- sidebar --------------------------------- */
 const counts = {};
