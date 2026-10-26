@@ -62,6 +62,14 @@
   .zone-head .cnt{font-size:11px;color:var(--muted);background:#22334a;border-radius:20px;padding:2px 8px}
   .zone-card p{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.45}
   .zone-actions{display:flex;gap:6px;margin-top:8px}
+
+  /* every town in the zone with its drive time, so nobody has to click pins to find them */
+  .towns{list-style:none;margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+  .towns li{display:flex;gap:8px;align-items:baseline;font-size:12px;padding:3px 4px;border-radius:5px;cursor:pointer}
+  .towns li:hover{background:#25384f}
+  .towns .tn{flex:1;min-width:0;color:var(--text)}
+  .towns .td{color:var(--muted);font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .towns .ad{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#0d1420;background:#e8eef6;border-radius:10px;padding:1px 6px;margin-left:5px}
   .zbtn{
     font-size:11px;border:1px solid var(--line);background:transparent;color:var(--text);
     border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s;
@@ -360,6 +368,7 @@ function addCity(c){
   }).bindPopup(popupHTML(c));
   m.bindTooltip(c.n,{permanent:true,direction:'right',offset:[8,0],className:'city-label'});
   m.addTo(groups[c.z]);
+  c.marker = m;
 }
 CITIES.forEach(addCity);
 
@@ -490,11 +499,23 @@ function showRegion(key){
         <span class="cnt">${counts[k]||0}</span>
       </div>
       <p>${z.desc}</p>
+      <ul class="towns">${CITIES.filter(c => c.z === k).map(c => `
+        <li data-town="${c.n}"><span class="tn">${c.star ? "⭐ " : ""}${c.n}${c.ads ? '<span class="ad">Ads</span>' : ''}</span>${c.d ? `<span class="td">${c.d}</span>` : ''}</li>`).join('')}
+      </ul>
       <div class="zone-actions">
         <button class="zbtn" data-act="zoom">🔍 Zoom</button>
         <button class="zbtn" data-act="toggle">👁 Show / hide</button>
       </div>`;
     card.addEventListener('click',e=>{
+      const town = e.target.closest('[data-town]');
+      if(town){
+        const c = CITIES.find(x => x.n === town.dataset.town);
+        if(!map.hasLayer(groups[k])){ groups[k].addTo(map); card.classList.remove('off'); }
+        map.flyTo(c.ll, Math.max(map.getZoom(), 10), {duration:.9});
+        map.once('moveend', () => c.marker.openPopup());
+        if(window.innerWidth<=820) document.getElementById('sidebar').classList.remove('open');
+        return;
+      }
       const btn = e.target.closest('.zbtn');
       if(btn && btn.dataset.act==='toggle'){
         e.stopPropagation();
