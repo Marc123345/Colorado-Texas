@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Colorado &amp; Texas Commercial Coating Territory Map | RoofCoat Leads</title>
+<title>Mustang Exterior — Colorado &amp; Texas Territory Map | RoofCoat Leads</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'"/>
 <style>
@@ -21,6 +21,8 @@
   }
   .logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#e8842c);display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
   header h1{font-size:17px;font-weight:700;letter-spacing:.2px}
+  .brand{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+  .tab small{font-weight:500;opacity:.75;margin-left:4px}
   header .sub{font-size:12px;color:var(--muted);margin-top:2px}
   .hdr-stats{margin-left:auto;display:flex;gap:18px}
   .stat{text-align:right}
@@ -124,8 +126,9 @@
 <body>
 
 <header>
-  <div class="logo">🛡️</div>
+  <div class="logo">🐎</div>
   <div>
+    <div class="brand">Mustang Exterior</div>
     <h1 id="hdrTitle">Commercial Coating — Territory Map</h1>
     <div class="sub" id="hdrSub"></div>
   </div>
@@ -134,8 +137,8 @@
     <div class="stat"><b id="stZones">0</b><span>Zones</span></div>
   </div>
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-region="co">Colorado</button>
-    <button class="tab" role="tab" data-region="tx">Texas</button>
+    <button class="tab" role="tab" data-region="co">Colorado <small>· Paul</small></button>
+    <button class="tab" role="tab" data-region="tx">Texas <small>· Tap</small></button>
   </div>
 </header>
 
@@ -158,25 +161,25 @@
 /* ---------------------------------- data ---------------------------------- */
 /* Two territories that never touch, so each is its own view. Colorado comes
    first because it is the new one; the Texas side is the original map with the
-   drive times re-measured from his front door. */
+   drive times re-measured from Tap's front door. Paul runs Colorado, Tap runs Texas. */
 const REGIONS = {
   co: {
     title:"Colorado Commercial Coating — Territory Map",
     labelZoom:7,
-    sub:"Front Range I-25 corridor · northern ag & energy tier · Western Slope · southern reaches",
+    sub:"Paul's territory · Front Range I-25 corridor · northern ag & energy tier · Western Slope · southern reaches",
     notes:[
-      `<b>Where the ads run:</b> Denver metro, Colorado Springs, Fort Collins, Greeley and Pueblo only — the pins marked “Ads live”. That is one tight 2-hour corridor holding nearly all the roofs, and the hail story writes the ad copy. Grand Junction gets added later as its own small spend if he wants the Slope. Everything else is wasted budget.`,
+      `<b>Where the ads run:</b> Denver metro, Colorado Springs, Fort Collins, Greeley and Pueblo only — the pins marked “Ads live”. That is one tight 2-hour corridor holding nearly all the roofs, and the hail story writes the ad copy. Grand Junction gets added later as its own small spend if Paul wants the Slope. Everything else is wasted budget.`,
       `<b>Left off on purpose:</b> the mountain resorts — Vail, Aspen, Summit County, Steamboat. The commercial stock is steep metal in snow country, not flat-roof coating work, and the towns make contractors jump through permitting hoops.`,
-      `<b>Ask Paul:</b> where does the Colorado crew sit? Based in Denver, the corridor splits cleanly into north days and south days. Based somewhere like the Springs, the weighting shifts south.`
+      `<b>Paul lives in Colorado</b> — which town decides the weighting. Based in Denver, the corridor splits cleanly into north days and south days. Based somewhere like the Springs, it shifts south. Worth confirming with him, then drive times here can be measured from his door the way Tap's are in Texas.`
     ]
   },
   tx: {
     title:"Texas Commercial Coating — Territory Map",
     /* the corridor towns sit too close together to label at the whole-region view */
     labelZoom:8,
-    sub:"US-75 corridor · North &amp; East Texas pockets · West Texas expansion · drive times from his front door",
+    sub:"Tap's territory · US-75 corridor · North &amp; East Texas pockets · West Texas expansion · drive times from Tap's front door",
     notes:[
-      `<b>He lives on the western edge of the corridor</b>, inside the West Wing — Whitesboro is 5 minutes away. Every drive time on this side of the map is measured from his front door, not from Sherman.`
+      `<b>Tap lives on the western edge of the corridor</b>, inside the West Wing — Whitesboro is 5 minutes away. Every drive time on this side of the map is measured from his front door, not from Sherman.`
     ]
   }
 };
@@ -193,7 +196,7 @@ const ZONES = {
   },
   slope: {
     region:"co", name:"Western Slope", color:"#e67e22",
-    desc:"A separate world, four hours over the mountains. Grand Junction is the only real commercial base out west — a later, separate spend if he wants it."
+    desc:"A separate world, four hours over the mountains. Grand Junction is the only real commercial base out west — a later, separate spend if Paul wants it."
   },
   south: {
     region:"co", name:"Southern Reaches", color:"#9b59b6",
@@ -203,11 +206,11 @@ const ZONES = {
   /* --- texas --- */
   core: {
     region:"tx", name:"US-75 Corridor Core", color:"#2f80ed",
-    desc:"Sherman/Denison center line — he lives on its western edge. Semiconductor build-out (TI + GlobiTech multi-billion-dollar plants) is driving new commercial construction north along US-75."
+    desc:"Sherman/Denison center line — Tap lives on its western edge. Semiconductor build-out (TI + GlobiTech multi-billion-dollar plants) is driving new commercial construction north along US-75."
   },
   west: {
     region:"tx", name:"West Wing", color:"#e67e22",
-    desc:"His home patch. Gainesville is the anchor — I-35 warehouse and manufacturing stock — running out toward Bowie."
+    desc:"Tap's home patch. Gainesville is the anchor — I-35 warehouse and manufacturing stock — running out toward Bowie."
   },
   east: {
     region:"tx", name:"East Wing", color:"#27ae60",
@@ -219,11 +222,11 @@ const ZONES = {
   },
   wtx: {
     region:"tx", name:"West Texas Expansion", color:"#e74c3c",
-    desc:"Hail belt + brutal UV = constant coating demand. Ag processing, oilfield services, warehouse stock and two air force bases, running out along I-20 to the Permian Basin. Wichita Falls is the natural bridge from his current territory."
+    desc:"Hail belt + brutal UV = constant coating demand. Ag processing, oilfield services, warehouse stock and two air force bases, running out along I-20 to the Permian Basin. Wichita Falls is the natural bridge from Tap's current territory."
   }
 };
 
-/* d = distance and drive time. Texas: from his front door.
+/* d = distance and drive time. Texas: from Tap's front door.
    Colorado: as given in the brief, from Denver unless it says otherwise.
    ads = inside the Colorado ad footprint. */
 const CITIES = [
@@ -268,7 +271,7 @@ const CITIES = [
   {n:"Melissa", z:"core", ll:[33.286,-96.573], d:"45 mi · 48 min", b:"Southern tip of the corridor — Metroplex growth frontier."},
 
   /* --- west wing --- */
-  {n:"Whitesboro", z:"west", ll:[33.656,-96.907], d:"3 mi · 5 min", b:"His doorstep. US-82 commercial between Sherman and Gainesville."},
+  {n:"Whitesboro", z:"west", ll:[33.656,-96.907], d:"3 mi · 5 min", b:"Tap's doorstep. US-82 commercial between Sherman and Gainesville."},
   {n:"Collinsville", z:"west", ll:[33.561,-96.911], d:"10 mi · 15 min", b:"Small commercial/ag."},
   {n:"Gainesville", z:"west", ll:[33.626,-97.133], d:"22 mi · 25 min", b:"Western commercial anchor on I-35 — strong warehouse and manufacturing stock.", star:true},
   {n:"Valley View", z:"west", ll:[33.489,-97.163], d:"30 mi · 35 min", b:"I-35 corridor south of Gainesville."},
@@ -383,7 +386,7 @@ zoneCircle([39.7392,-104.9903], 40000, "front", "Denver metro", "25 mile working
 zoneCircle([38.8339,-104.8214], 30000, "front", "Colorado Springs", "Military installations, warehouse belt, same hail exposure as Denver.");
 zoneCircle([38.2544,-104.6091], 22000, "front", "Pueblo", "Industrial south anchor.");
 zoneCircle([40.5000,-104.9000], 30000, "north", "Fort Collins / Greeley", "North anchor pair inside the ad footprint.");
-zoneCircle([39.0639,-108.5506], 35000, "slope", "Grand Junction", "Its own small spend later, only if he wants the Slope.");
+zoneCircle([39.0639,-108.5506], 35000, "slope", "Grand Junction", "Its own small spend later, only if Paul wants the Slope.");
 
 /* -------- texas shapes -------- */
 
@@ -392,7 +395,7 @@ L.polygon([
   [33.92,-97.90],[33.92,-95.50],[33.20,-95.50],[33.20,-97.90]
 ],{
   color:"#2f80ed", weight:2, dashArray:"6 6", fillColor:"#2f80ed", fillOpacity:.06
-}).bindPopup(`<div class="pp"><h3>Primary Territory Band</h3><span class="tag" style="background:#2f80ed">≈100 mi wide</span><p>US-75 corridor with Sherman/Denison as the center line, extending east to Paris and west to Bowie. He lives on its western edge. Radius adjustable once live lead data shows where the best jobs come from.</p></div>`)
+}).bindPopup(`<div class="pp"><h3>Primary Territory Band</h3><span class="tag" style="background:#2f80ed">≈100 mi wide</span><p>US-75 corridor with Sherman/Denison as the center line, extending east to Paris and west to Bowie. Tap lives on its western edge. Radius adjustable once live lead data shows where the best jobs come from.</p></div>`)
  .addTo(groups.core);
 
 /* east texas pocket circle */
